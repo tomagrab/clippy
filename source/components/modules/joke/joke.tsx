@@ -9,24 +9,51 @@ type JokeProps = {
 
 export default function Joke({onBack}: JokeProps) {
 	const [theJoke, setTheJoke] = useState<JokeData | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
 
 	useInput((input, key) => {
-		if (key.escape || input === 'q' || key.return) {
+		// Only handle input after the joke has loaded
+		if (!isLoading && (key.escape || input === 'q' || key.return)) {
 			onBack();
 		}
 	});
 
 	useEffect(() => {
 		const fetchJoke = async () => {
-			const jokeData = await getJoke();
-			setTheJoke(jokeData);
+			setIsLoading(true);
+			try {
+				const jokeData = await getJoke();
+				setTheJoke(jokeData);
+			} catch (error) {
+				console.error('Failed to fetch joke:', error);
+				setTheJoke({
+					id: 'error',
+					joke: 'Failed to load joke. Please try again!',
+					status: 500,
+				});
+			} finally {
+				setIsLoading(false);
+			}
 		};
 
 		fetchJoke();
 	}, []);
 
+	if (isLoading) {
+		return (
+			<Box flexDirection="column" gap={1}>
+				<Text color="yellow" bold>
+					Loading joke...
+				</Text>
+				<Text color="gray" dimColor>
+					Please wait...
+				</Text>
+			</Box>
+		);
+	}
+
 	return (
-		<Box flexDirection="column">
+		<Box flexDirection="column" gap={1}>
 			<Text color="green" bold>
 				😂 {theJoke?.joke}
 			</Text>

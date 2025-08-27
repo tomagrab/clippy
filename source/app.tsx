@@ -5,6 +5,7 @@ import Joke from './components/modules/joke/joke.js';
 import Header from './components/layout/header/header.js';
 import Fortune from './components/modules/fortune/fortune.js';
 import Menu from './components/layout/menu/menu.js';
+import ClippyWeb from './components/modules/clippy-web/clippy-web.js';
 
 type Props = {
 	name: string | undefined;
@@ -22,6 +23,9 @@ export default function App({name}: Props) {
 				break;
 			case 'Fortune':
 				setSelectedOption('Fortune');
+				break;
+			case 'Clippy Web':
+				setSelectedOption('Clippy Web');
 				break;
 			case 'Exit':
 				process.exit(0);
@@ -48,6 +52,7 @@ export default function App({name}: Props) {
 
 			{selectedOption === 'Joke' && <Joke onBack={onBack} />}
 			{selectedOption === 'Fortune' && <Fortune onBack={onBack} />}
+			{selectedOption === 'Clippy Web' && <ClippyWeb onBack={onBack} />}
 		</Box>
 	);
 }
