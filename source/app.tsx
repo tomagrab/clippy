@@ -1,9 +1,10 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {Box} from 'ink';
 import Joke from './components/modules/joke/joke.js';
 import Header from './components/layout/header/header.js';
 import Fortune from './components/modules/fortune/fortune.js';
+import Menu from './components/layout/menu/menu.js';
 
 type Props = {
 	name: string | undefined;
@@ -11,7 +12,28 @@ type Props = {
 	fortune: string | undefined;
 };
 
-export default function App({name, joke, fortune}: Props) {
+export default function App({name}: Props) {
+	const [selectedOption, setSelectedOption] = useState<string | null>(null);
+
+	const onSelect = (option: string | undefined) => {
+		switch (option) {
+			case 'Joke':
+				setSelectedOption('Joke');
+				break;
+			case 'Fortune':
+				setSelectedOption('Fortune');
+				break;
+			case 'Exit':
+				process.exit(0);
+			default:
+				break;
+		}
+	};
+
+	const onBack = () => {
+		setSelectedOption(null);
+	};
+
 	useEffect(() => {
 		if (name?.trim().length === 0) {
 			name = 'Stranger';
@@ -22,9 +44,10 @@ export default function App({name, joke, fortune}: Props) {
 		<Box flexDirection={`column`} padding={1} gap={1}>
 			<Header />
 
-			{joke ? <Joke /> : null}
+			{!selectedOption && <Menu onSelect={onSelect} />}
 
-			{fortune ? <Fortune fortune={fortune} /> : null}
+			{selectedOption === 'Joke' && <Joke onBack={onBack} />}
+			{selectedOption === 'Fortune' && <Fortune onBack={onBack} />}
 		</Box>
 	);
 }
