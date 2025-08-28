@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Box, Text, useInput} from 'ink';
 import TextInput from 'ink-text-input';
 import sendMessage from '../../../lib/api/clippy-web/clippy-web.js';
+import {createMessage} from '../../../lib/types/clippy-web/send-message.js';
 
 type ClippyWebProps = {
 	onBack: () => void;
@@ -23,15 +24,26 @@ export default function ClippyWeb({onBack}: ClippyWebProps) {
 
 		// Only send message if there's actual content
 		if (newValue.trim()) {
-			await sendMessage({text: newValue, type: 'typing'});
+			const typingMessage = createMessage('typing', newValue, {
+				isIncremental: true, // This replaces any previous typing message
+			});
+			await sendMessage(typingMessage);
+		} else {
+			// Send clear message when input becomes empty
+			const clearMessage = createMessage('clear', '', {
+				clearScope: 'typing',
+			});
+			await sendMessage(clearMessage);
 		}
-		// Don't send anything when input is empty - let the web app handle cleanup
 	};
 
 	const handleSubmit = async (text: string) => {
 		if (text.trim()) {
 			// Send final message when Enter is pressed
-			await sendMessage({text, type: 'final'});
+			const finalMessage = createMessage('message', text, {
+				priority: 'normal',
+			});
+			await sendMessage(finalMessage);
 		}
 		setValue(''); // Clear input when Enter is pressed
 	};

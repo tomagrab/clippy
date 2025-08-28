@@ -1,9 +1,6 @@
-type SendMessageProps = {
-	text: string;
-	type?: string;
-};
+import {SendMessageProps} from '../../types/clippy-web/send-message.js';
 
-export default async function sendMessage({text, type}: SendMessageProps) {
+export default async function sendMessage(messageProps: SendMessageProps) {
 	const CLIPPY_WEB_API_URL = process.env['CLIPPY_WEB_API_URL'];
 
 	if (!CLIPPY_WEB_API_URL) {
@@ -11,12 +8,18 @@ export default async function sendMessage({text, type}: SendMessageProps) {
 	}
 
 	try {
+		// Add timestamp if not provided
+		const messageWithTimestamp = {
+			...messageProps,
+			timestamp: messageProps.timestamp ?? Date.now(),
+		};
+
 		const clippyWebResponse = await fetch(CLIPPY_WEB_API_URL, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({text, type}),
+			body: JSON.stringify(messageWithTimestamp),
 		});
 
 		if (!clippyWebResponse.ok) {
